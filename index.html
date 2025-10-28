@@ -1,0 +1,1496 @@
+const drawGeneric = (ctx, canvas, progress) => {
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+
+      // Animated circles
+      for (let i = 0; i < 5; i++) {
+        const radius = 50 + i * 30;
+        const alpha = (1 - progress) * 0.3;
+        ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius * progress, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // Brain icon
+      ctx.fillStyle = 'white';
+      ctx.font = '80px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('🧠', centerX, centerY + 30);
+    };
+
+    const drawSpace = (ctx, canvas, progress, animation) => {
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+
+      // Stars
+      for (let i = 0; i < 50; i++) {
+        const x = (i * 137.5) % canvas.width;
+        const y = (i * 73.3) % canvas.height;
+        const size = 1 + (i % 3);
+        const twinkle = 0.3 + Math.sin(progress * Math.PI * 2 + i) * 0.7;
+        ctx.fillStyle = `rgba(255, 255, 255, ${twinkle})`;
+        ctx.fillRect(x, y, size, size);
+      }
+
+      // Sun
+      ctx.fillStyle = '#FDB813';
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 40 + Math.sin(progress * Math.PI * 4) * 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      if (animation === 'planets' || animation === 'facts') {
+        // Orbiting planets
+        const planetCount = 4;
+        for (let i = 0; i < planetCount; i++) {
+          const angle = (progress * Math.PI * 2) + (i * Math.PI * 2 / planetCount);
+          const distance = 80 + i * 40;
+          const x = centerX + Math.cos(angle) * distance;
+          const y = centerY + Math.sin(angle) * distance;
+          const colors = ['#E5E5E5', '#FFA500', '#4169E1', '#DC143C'];
+          const sizes = [8, 10, 15, 12];
+          
+          ctx.fillStyle = colors[i];
+          ctx.beginPath();
+          ctx.arc(x, y, sizes[i] * (0.5 + progress * 0.5), 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    };
+
+    const drawWater = (ctx, canvas, progress, animation) => {
+      const baseY = canvas.height / 2;
+
+      // Water
+      ctx.fillStyle = '#4A90E2';
+      ctx.fillRect(0, baseY, canvas.width, canvas.height - baseY);
+
+      // Waves
+      if (animation === 'waves' || animation === 'cycle') {
+        for (let i = 0; i < 3; i++) {
+          ctx.strokeStyle = `rgba(255, 255, 255, ${0.3 - i * 0.1})`;
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          for (let x = 0; x < canvas.width; x += 10) {
+            const y = baseY + Math.sin((x + progress * 100 + i * 50) * 0.05) * 20;
+            if (x === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+        }
+      }
+
+      // Sun/Cloud for water cycle
+      if (animation === 'cycle') {
+        // Sun
+        ctx.fillStyle = '#FFD700';
+        ctx.beginPath();
+        ctx.arc(150, 80, 30, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Cloud
+        const cloudX = 300 + progress * 200;
+        ctx.fillStyle = 'rgba(200, 200, 200, 0.8)';
+        ctx.beginPath();
+        ctx.arc(cloudX, 100, 30, 0, Math.PI * 2);
+        ctx.arc(cloudX + 25, 100, 35, 0, Math.PI * 2);
+        ctx.arc(cloudX + 50, 100, 30, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Rain drops
+        if (progress > 0.5) {
+          ctx.fillStyle = '#4A90E2';
+          for (let i = 0; i < 10; i++) {
+            const x = cloudX + i * 8;
+            const y = 130 + ((progress - 0.5) * 2) * 100;
+            ctx.fillRect(x, y, 2, 10);
+          }
+        }
+      }
+
+      // Fish
+      const fishX = 200 + Math.sin(progress * Math.PI * 2) * 100;
+      const fishY = baseY + 80;
+      ctx.fillStyle = '#FF6B6B';
+      ctx.beginPath();
+      ctx.ellipse(fishX, fishY, 30, 15, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Fish tail
+      ctx.beginPath();
+      ctx.moveTo(fishX - 30, fishY);
+      ctx.lineTo(fishX - 45, fishY - 10);
+      ctx.lineTo(fishX - 45, fishY + 10);
+      ctx.closePath();
+      ctx.fill();
+    };
+
+    const drawAnimal = (ctx, canvas, progress, animation) => {
+      const centerX = canvas.width / 2;
+      const groundY = canvas.height - 100;
+
+      // Ground
+      ctx.fillStyle = '#8B7355';
+      ctx.fillRect(0, groundY, canvas.width, 100);
+
+      // Grass
+      ctx.fillStyle = '#90EE90';
+      for (let i = 0; i < 50; i++) {
+        const x = (i * 20) % canvas.width;
+        ctx.fillRect(x, groundY, 3, -15);
+      }
+
+      // Simple animal (bear-like)
+      const animalX = centerX + Math.sin(progress * Math.PI) * 100;
+      
+      // Body
+      ctx.fillStyle = '#8B4513';
+      ctx.beginPath();
+      ctx.ellipse(animalX, groundY - 30, 50, 40, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Head
+      ctx.beginPath();
+      ctx.arc(animalX + 40, groundY - 50, 25, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Ears
+      ctx.beginPath();
+      ctx.arc(animalX + 30, groundY - 65, 10, 0, Math.PI * 2);
+      ctx.arc(animalX + 50, groundY - 65, 10, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Legs
+      ctx.fillRect(animalX - 30, groundY - 30, 15, 30);
+      ctx.fillRect(animalX - 10, groundY - 30, 15, 30);
+
+      if (animation === 'adapt') {
+        // Show different animals/features
+        ctx.fillStyle = 'white';
+        ctx.font = '40px Arial';
+        ctx.textAlign = 'center';
+        const icons = ['🐻', '🐠', '🦅', '🐸'];
+        const icon = icons[Math.floor(progress * icons.length) % icons.length];
+        ctx.fillText(icon, centerX - 150, groundY - 100);
+      }
+    };
+
+    const drawDynamic = (ctx, canvas, progress, animation, topic) => {
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+
+      // Animated background circles
+      for (let i = 0; i < 5; i++) {
+        const radius = 50 + i * 30;
+        const alpha = (1 - progress) * 0.3;
+        ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius * progress, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // Central icon
+      ctx.fillStyle = 'white';
+      ctx.font = '80px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('🧠', centerX, centerY + 30);
+
+      // Floating particles
+      for (let i = 0; i < 20; i++) {
+        const angle = (i / 20) * Math.PI * 2 + progress * Math.PI;
+        const distance = 100 + Math.sin(progress * Math.PI * 2 + i) * 30;
+        const x = centerX + Math.cos(angle) * distance;
+        const y = centerY + Math.sin(angle) * distance;
+        
+        ctx.fillStyle = `rgba(255, 255, 255, ${0.5 + Math.sin(progress * Math.PI * 4 + i) * 0.5})`;
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Topic-related emoji
+      if (animation === 'concept' || animation === 'example') {
+        ctx.font = '50px Arial';
+        ctx.fillText('✨', centerX - 120, centerY - 80);
+        ctx.fillText('💡', centerX + 120, centerY - 80);
+        ctx.fillText('📚', centerX - 120, centerY + 120);
+        ctx.fillText('🎯', centerX + 120, centerY + 120);
+      }
+    };import React, { useState, useEffect, useRef } from 'react';
+import { BookOpen, Video, Brain, Trophy, Users, Settings, Menu, X, Play, CheckCircle, XCircle, Download, Globe, BarChart3, MessageSquare, Lightbulb, Award, Pause, SkipForward, ArrowLeft, Mic, MicOff } from 'lucide-react';
+
+const LearningPlatform = () => {
+  const [currentPage, setCurrentPage] = useState('home');
+  const [topic, setTopic] = useState('');
+  const [isLearning, setIsLearning] = useState(false);
+  const [currentLesson, setCurrentLesson] = useState(null);
+  const [quizScore, setQuizScore] = useState(null);
+  const [selectedAnswers, setSelectedAnswers] = useState({});
+  const [showResults, setShowResults] = useState(false);
+  const [userProgress, setUserProgress] = useState({
+    videosWatched: 0,
+    quizzesCompleted: 0,
+    totalScore: 0,
+    badges: []
+  });
+  const [gameScore, setGameScore] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [username, setUsername] = useState('');
+  const [loginForm, setLoginForm] = useState({ username: '', password: '' });
+  const [animatedVideo, setAnimatedVideo] = useState(null);
+  const [isPlayingVideo, setIsPlayingVideo] = useState(false);
+  const [videoProgress, setVideoProgress] = useState(0);
+  const [isListening, setIsListening] = useState(false);
+  const [recognition, setRecognition] = useState(null);
+  const canvasRef = useRef(null);
+  const audioContextRef = useRef(null);
+
+  // Initialize speech recognition
+  useEffect(() => {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognitionInstance = new SpeechRecognition();
+      recognitionInstance.continuous = false;
+      recognitionInstance.interimResults = false;
+      recognitionInstance.lang = 'en-US';
+
+      recognitionInstance.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setTopic(transcript);
+        setIsListening(false);
+      };
+
+      recognitionInstance.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+      };
+
+      recognitionInstance.onend = () => {
+        setIsListening(false);
+      };
+
+      setRecognition(recognitionInstance);
+    }
+  }, []);
+
+  const toggleMicrophone = () => {
+    if (!recognition) {
+      alert('Speech recognition is not supported in your browser. Please use Chrome, Edge, or Safari.');
+      return;
+    }
+
+    if (isListening) {
+      recognition.stop();
+      setIsListening(false);
+    } else {
+      recognition.start();
+      setIsListening(true);
+    }
+  };
+
+  const handleGoBack = () => {
+    if (currentPage === 'quiz' || currentPage === 'game') {
+      setCurrentPage('video');
+    } else if (currentPage === 'video' || currentPage === 'progress') {
+      setIsLearning(false);
+      setCurrentPage('home');
+      setTopic('');
+      setSelectedAnswers({});
+      setShowResults(false);
+      setQuizScore(null);
+    }
+  };
+
+  // Enhanced lesson data generator with topic-specific animations
+  const generateLesson = (topicInput) => {
+    const topicLower = topicInput.toLowerCase();
+    
+    // Detect topic category for specialized animations
+    let detectedType = 'generic';
+    let title = topicInput;
+    let scenes = [];
+    
+    if (topicLower.includes('volcano') || topicLower.includes('erupt')) {
+      detectedType = 'volcano';
+      title = 'How Volcanoes Erupt';
+      scenes = [
+        {
+          duration: 15,
+          title: "Introduction",
+          text: "Welcome! Today we're learning about volcanoes. These amazing mountains can shoot hot lava into the sky!",
+          narration: "Welcome! Today we're learning about volcanoes. These amazing mountains can shoot hot lava into the sky!",
+          visuals: { type: 'volcano', animation: 'intro' }
+        },
+        {
+          duration: 15,
+          title: "Key Idea",
+          text: "Deep underground, hot melted rock called magma builds up pressure. When the pressure gets too strong, it breaks through the Earth's surface!",
+          narration: "Deep underground, hot melted rock called magma builds up pressure. When the pressure gets too strong, it breaks through the Earth's surface!",
+          visuals: { type: 'volcano', animation: 'eruption' }
+        },
+        {
+          duration: 15,
+          title: "Real Example",
+          text: "Mount St. Helens erupted in 1980, sending ash 15 miles into the sky! Volcanoes release lava, ash, and gases when they erupt.",
+          narration: "Mount St. Helens erupted in 1980, sending ash 15 miles into the sky! Volcanoes release lava, ash, and gases when they erupt.",
+          visuals: { type: 'volcano', animation: 'example' }
+        },
+        {
+          duration: 15,
+          title: "Summary",
+          text: "Remember: Magma underground becomes lava above ground. Pressure builds until boom - eruption! Thanks for watching! Keep exploring and learning!",
+          narration: "Remember: Magma underground becomes lava above ground. Pressure builds until boom - eruption! Thanks for watching! Keep exploring and learning!",
+          visuals: { type: 'volcano', animation: 'summary' }
+        }
+      ];
+    } else if (topicLower.includes('photo') || topicLower.includes('plant') || topicLower.includes('tree')) {
+      detectedType = 'plant';
+      title = 'How Plants Make Food';
+      scenes = [
+        {
+          duration: 15,
+          title: "Introduction",
+          text: "Hi there! Today we'll discover how plants make their own food through photosynthesis. It's like magic, but it's science!",
+          narration: "Hi there! Today we'll discover how plants make their own food through photosynthesis. It's like magic, but it's science!",
+          visuals: { type: 'plant', animation: 'intro' }
+        },
+        {
+          duration: 15,
+          title: "Key Idea",
+          text: "Plants use sunlight, water, and carbon dioxide to create sugar for energy. The green chlorophyll in leaves captures the sunlight!",
+          narration: "Plants use sunlight, water, and carbon dioxide to create sugar for energy. The green chlorophyll in leaves captures the sunlight!",
+          visuals: { type: 'plant', animation: 'process' }
+        },
+        {
+          duration: 15,
+          title: "Real Example",
+          text: "When you see a tree in the park, it's making food from sunlight right now! It also releases oxygen that we breathe.",
+          narration: "When you see a tree in the park, it's making food from sunlight right now! It also releases oxygen that we breathe.",
+          visuals: { type: 'plant', animation: 'example' }
+        },
+        {
+          duration: 15,
+          title: "Summary",
+          text: "Plants are amazing food factories! Sunlight plus water plus CO2 equals food and oxygen. Thanks for watching! Keep exploring and learning!",
+          narration: "Plants are amazing food factories! Sunlight plus water plus CO2 equals food and oxygen. Thanks for watching! Keep exploring and learning!",
+          visuals: { type: 'plant', animation: 'summary' }
+        }
+      ];
+    } else if (topicLower.includes('solar') || topicLower.includes('planet') || topicLower.includes('space')) {
+      detectedType = 'space';
+      title = topicInput;
+      scenes = [
+        {
+          duration: 15,
+          title: "Introduction",
+          text: `Welcome to the amazing world of ${topicInput}! Get ready to explore the wonders beyond Earth!`,
+          narration: `Welcome to the amazing world of ${topicInput}! Get ready to explore the wonders beyond Earth!`,
+          visuals: { type: 'space', animation: 'intro' }
+        },
+        {
+          duration: 15,
+          title: "Key Concept",
+          text: "Our solar system has 8 planets orbiting the Sun. Each planet is unique with different sizes, colors, and features!",
+          narration: "Our solar system has 8 planets orbiting the Sun. Each planet is unique with different sizes, colors, and features!",
+          visuals: { type: 'space', animation: 'planets' }
+        },
+        {
+          duration: 15,
+          title: "Amazing Facts",
+          text: "Jupiter is the biggest planet, Mars is red, and Saturn has beautiful rings. The Sun is a giant star at the center of it all!",
+          narration: "Jupiter is the biggest planet, Mars is red, and Saturn has beautiful rings. The Sun is a giant star at the center of it all!",
+          visuals: { type: 'space', animation: 'facts' }
+        },
+        {
+          duration: 15,
+          title: "Summary",
+          text: "Space is full of wonders waiting to be discovered. Keep looking up at the stars! Thanks for watching! Keep exploring and learning!",
+          narration: "Space is full of wonders waiting to be discovered. Keep looking up at the stars! Thanks for watching! Keep exploring and learning!",
+          visuals: { type: 'space', animation: 'summary' }
+        }
+      ];
+    } else if (topicLower.includes('water') || topicLower.includes('ocean') || topicLower.includes('sea')) {
+      detectedType = 'water';
+      title = topicInput;
+      scenes = [
+        {
+          duration: 15,
+          title: "Introduction",
+          text: `Dive into the world of ${topicInput}! Water covers most of our planet and is home to amazing creatures!`,
+          narration: `Dive into the world of ${topicInput}! Water covers most of our planet and is home to amazing creatures!`,
+          visuals: { type: 'water', animation: 'intro' }
+        },
+        {
+          duration: 15,
+          title: "Key Idea",
+          text: "Water moves in a cycle: evaporation, condensation, and precipitation. It's constantly changing form and moving around Earth!",
+          narration: "Water moves in a cycle: evaporation, condensation, and precipitation. It's constantly changing form and moving around Earth!",
+          visuals: { type: 'water', animation: 'cycle' }
+        },
+        {
+          duration: 15,
+          title: "Fun Facts",
+          text: "Oceans contain 97% of Earth's water! Waves are made by wind, and tides are caused by the moon's gravity pulling on water.",
+          narration: "Oceans contain 97% of Earth's water! Waves are made by wind, and tides are caused by the moon's gravity pulling on water.",
+          visuals: { type: 'water', animation: 'waves' }
+        },
+        {
+          duration: 15,
+          title: "Summary",
+          text: "Water is essential for all life on Earth. Protect our oceans and rivers! Thanks for watching! Keep exploring and learning!",
+          narration: "Water is essential for all life on Earth. Protect our oceans and rivers! Thanks for watching! Keep exploring and learning!",
+          visuals: { type: 'water', animation: 'summary' }
+        }
+      ];
+    } else if (topicLower.includes('animal') || topicLower.includes('wildlife') || topicLower.includes('zoo')) {
+      detectedType = 'animal';
+      title = topicInput;
+      scenes = [
+        {
+          duration: 15,
+          title: "Introduction",
+          text: `Welcome to the fascinating world of ${topicInput}! Animals come in all shapes, sizes, and colors!`,
+          narration: `Welcome to the fascinating world of ${topicInput}! Animals come in all shapes, sizes, and colors!`,
+          visuals: { type: 'animal', animation: 'intro' }
+        },
+        {
+          duration: 15,
+          title: "Key Concept",
+          text: "Animals are classified into groups: mammals, birds, reptiles, amphibians, and fish. Each group has special features!",
+          narration: "Animals are classified into groups: mammals, birds, reptiles, amphibians, and fish. Each group has special features!",
+          visuals: { type: 'animal', animation: 'types' }
+        },
+        {
+          duration: 15,
+          title: "Amazing Adaptations",
+          text: "Animals adapt to their environment. Polar bears have thick fur, fish have gills, and birds have wings for flying!",
+          narration: "Animals adapt to their environment. Polar bears have thick fur, fish have gills, and birds have wings for flying!",
+          visuals: { type: 'animal', animation: 'adapt' }
+        },
+        {
+          duration: 15,
+          title: "Summary",
+          text: "Every animal is special and important to nature. Protect wildlife everywhere! Thanks for watching! Keep exploring and learning!",
+          narration: "Every animal is special and important to nature. Protect wildlife everywhere! Thanks for watching! Keep exploring and learning!",
+          visuals: { type: 'animal', animation: 'summary' }
+        }
+      ];
+    } else {
+      // Generic adaptable content for ANY topic
+      detectedType = 'dynamic';
+      title = topicInput;
+      scenes = [
+        {
+          duration: 15,
+          title: "Introduction",
+          text: `Welcome! Today we're learning about ${topicInput}. This is an exciting topic that will help you understand the world better!`,
+          narration: `Welcome! Today we're learning about ${topicInput}. This is an exciting topic that will help you understand the world better!`,
+          visuals: { type: 'dynamic', animation: 'intro', topic: topicInput }
+        },
+        {
+          duration: 15,
+          title: "Key Concept",
+          text: `The main idea of ${topicInput} involves understanding key principles and how they work together in nature and science.`,
+          narration: `The main idea of ${topicInput} involves understanding key principles and how they work together in nature and science.`,
+          visuals: { type: 'dynamic', animation: 'concept', topic: topicInput }
+        },
+        {
+          duration: 15,
+          title: "Real Example",
+          text: `You can see ${topicInput} in action all around you in everyday life. Let's explore how it works with a real example!`,
+          narration: `You can see ${topicInput} in action all around you in everyday life. Let's explore how it works with a real example!`,
+          visuals: { type: 'dynamic', animation: 'example', topic: topicInput }
+        },
+        {
+          duration: 15,
+          title: "Summary",
+          text: `Great job learning about ${topicInput}! Remember the key points we covered today. Thanks for watching! Keep exploring and learning!`,
+          narration: `Great job learning about ${topicInput}! Remember the key points we covered today. Thanks for watching! Keep exploring and learning!`,
+          visuals: { type: 'dynamic', animation: 'summary', topic: topicInput }
+        }
+      ];
+    }
+    
+    const lessons = {
+      'volcanoes': {
+        title,
+        videoId: 'lRJkVx1kq9I',
+        animatedScenes: scenes,
+        summary: 'Volcanoes erupt when molten rock called magma rises from deep within Earth. Pressure builds up until the magma breaks through the surface as lava, ash, and gases. This happens because tectonic plates move and create weak spots in Earth\'s crust. Volcanic eruptions can be explosive or gentle, depending on the type of magma.',
+        quiz: [
+          {
+            question: 'What is magma called when it reaches the surface?',
+            options: ['Lava', 'Rock', 'Steam', 'Ash'],
+            correct: 0,
+            explanation: 'When magma reaches the surface, it\'s called lava! Magma is underground, lava is above ground.'
+          },
+          {
+            question: 'What causes volcanoes to erupt?',
+            options: ['Rain', 'Pressure buildup', 'Wind', 'Temperature drop'],
+            correct: 1,
+            explanation: 'Pressure builds up from gases and heat until the magma breaks through the surface.'
+          },
+          {
+            question: 'Volcanic eruptions always happen quickly and explosively.',
+            options: ['True', 'False'],
+            correct: 1,
+            explanation: 'False! Some volcanoes erupt slowly and gently, while others are explosive. It depends on the type of magma.'
+          },
+          {
+            question: 'What creates weak spots in Earth\'s crust for volcanoes?',
+            options: ['Ocean currents', 'Tectonic plates moving', 'Earthquakes only', 'The moon'],
+            correct: 1,
+            explanation: 'Tectonic plates moving create weak spots where magma can push through more easily.'
+          },
+          {
+            question: 'Which of these comes out during a volcanic eruption?',
+            options: ['Only lava', 'Only ash', 'Lava, ash, and gases', 'Water'],
+            correct: 2,
+            explanation: 'Volcanic eruptions release lava, ash, and gases all together - it\'s a powerful mix!'
+          }
+        ],
+        game: {
+          type: 'matching',
+          title: 'Volcano Parts Match',
+          items: [
+            { term: 'Magma', match: 'Hot melted rock underground' },
+            { term: 'Lava', match: 'Magma that reached the surface' },
+            { term: 'Crater', match: 'Opening at the top of a volcano' },
+            { term: 'Ash Cloud', match: 'Tiny rock pieces blown into the air' }
+          ]
+        }
+      },
+      'photosynthesis': {
+        title,
+        videoId: 'UPBMG5EYydo',
+        animatedScenes: scenes,
+        summary: 'Photosynthesis is how plants make their own food using sunlight, water, and carbon dioxide. Plants capture sunlight with chlorophyll (the green stuff in leaves) and convert it into sugar for energy. They release oxygen as a byproduct, which we breathe! This process happens in the leaves and is essential for all life on Earth.',
+        quiz: [
+          {
+            question: 'What do plants need for photosynthesis?',
+            options: ['Sunlight, water, CO2', 'Only water', 'Soil and air', 'Moon and stars'],
+            correct: 0,
+            explanation: 'Plants need three things: sunlight for energy, water from roots, and carbon dioxide from air.'
+          },
+          {
+            question: 'What makes leaves look green?',
+            options: ['Water', 'Chlorophyll', 'Oxygen', 'Sugar'],
+            correct: 1,
+            explanation: 'Chlorophyll is the green pigment that captures sunlight and makes leaves appear green!'
+          },
+          {
+            question: 'What do plants release during photosynthesis?',
+            options: ['Carbon dioxide', 'Oxygen', 'Nitrogen', 'Helium'],
+            correct: 1,
+            explanation: 'Plants release oxygen, which is what we breathe! They take in CO2 and give us O2.'
+          },
+          {
+            question: 'Where does photosynthesis happen?',
+            options: ['Roots', 'Stem', 'Leaves', 'Flowers'],
+            correct: 2,
+            explanation: 'Photosynthesis happens mainly in the leaves where chlorophyll is found.'
+          },
+          {
+            question: 'Photosynthesis only happens at night.',
+            options: ['True', 'False'],
+            correct: 1,
+            explanation: 'False! Photosynthesis needs sunlight, so it happens during the day.'
+          }
+        ],
+        game: {
+          type: 'matching',
+          title: 'Photosynthesis Ingredients',
+          items: [
+            { term: 'Chlorophyll', match: 'Green pigment that captures light' },
+            { term: 'Carbon Dioxide', match: 'Gas plants take in from air' },
+            { term: 'Oxygen', match: 'Gas plants release for us' },
+            { term: 'Glucose', match: 'Sugar food plants make' }
+          ]
+        }
+      },
+      'default': {
+        title,
+        videoId: 'dQw4w9WgXcQ',
+        animatedScenes: scenes,
+        summary: `This lesson explores ${topicInput} in an engaging and educational way. Through visual explanations and real-world examples, you'll understand the key concepts. The topic is broken down into simple, digestible parts perfect for learners aged 10-15. Remember to watch the video and take the quiz!`,
+        quiz: [
+          {
+            question: `What is the main focus of learning about ${topicInput}?`,
+            options: ['Understanding the basics', 'Memorizing facts', 'Ignoring details', 'Random guessing'],
+            correct: 0,
+            explanation: 'Learning starts with understanding the basic concepts and building from there!'
+          },
+          {
+            question: `Why is ${topicInput} important to learn?`,
+            options: ['It\'s not important', 'It helps us understand the world', 'Only for tests', 'No reason'],
+            correct: 1,
+            explanation: 'Every topic we learn helps us understand more about how the world works!'
+          },
+          {
+            question: 'Learning is more effective when you engage with the material.',
+            options: ['True', 'False'],
+            correct: 0,
+            explanation: 'True! Active learning through videos, quizzes, and games helps you remember better.'
+          }
+        ],
+        game: {
+          type: 'matching',
+          title: `${topicInput} Concepts`,
+          items: [
+            { term: 'Observation', match: 'Looking carefully at details' },
+            { term: 'Analysis', match: 'Breaking down information' },
+            { term: 'Understanding', match: 'Grasping the main idea' },
+            { term: 'Application', match: 'Using what you learned' }
+          ]
+        }
+      }
+    };
+
+    const key = topicLower.includes('volcano') ? 'volcanoes' :
+                topicLower.includes('photo') || topicLower.includes('plant') ? 'photosynthesis' :
+                'default';
+    
+    return { ...lessons[key], detectedType };
+  };
+
+  // AI Animated Video Component
+  const AnimatedVideoPlayer = ({ scenes, onComplete }) => {
+    const [currentScene, setCurrentScene] = useState(0);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [sceneProgress, setSceneProgress] = useState(0);
+    const canvasRef = useRef(null);
+    const animationRef = useRef(null);
+    const speechSynthRef = useRef(null);
+
+    useEffect(() => {
+      if (isPlaying && canvasRef.current) {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        const scene = scenes[currentScene];
+        let startTime = Date.now();
+        const duration = scene.duration * 1000;
+
+        const animate = () => {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          setSceneProgress(progress);
+
+          // Clear canvas
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          // Background gradient
+          const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+          if (scene.visuals.type === 'volcano') {
+            gradient.addColorStop(0, '#FFE5B4');
+            gradient.addColorStop(1, '#FF6B35');
+          } else if (scene.visuals.type === 'plant') {
+            gradient.addColorStop(0, '#A8E6CF');
+            gradient.addColorStop(1, '#3DDC97');
+          } else {
+            gradient.addColorStop(0, '#667EEA');
+            gradient.addColorStop(1, '#764BA2');
+          }
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          // Draw animated visuals
+          if (scene.visuals.type === 'volcano') {
+            drawVolcano(ctx, canvas, progress, scene.visuals.animation);
+          } else if (scene.visuals.type === 'plant') {
+            drawPlant(ctx, canvas, progress, scene.visuals.animation);
+          } else if (scene.visuals.type === 'space') {
+            drawSpace(ctx, canvas, progress, scene.visuals.animation);
+          } else if (scene.visuals.type === 'water') {
+            drawWater(ctx, canvas, progress, scene.visuals.animation);
+          } else if (scene.visuals.type === 'animal') {
+            drawAnimal(ctx, canvas, progress, scene.visuals.animation);
+          } else if (scene.visuals.type === 'dynamic') {
+            drawDynamic(ctx, canvas, progress, scene.visuals.animation, scene.visuals.topic);
+          } else {
+            drawGeneric(ctx, canvas, progress);
+          }
+
+          // Draw title
+          ctx.fillStyle = 'white';
+          ctx.font = 'bold 32px Arial';
+          ctx.textAlign = 'center';
+          ctx.fillText(scene.title, canvas.width / 2, 50);
+
+          // Draw subtitle with text animation
+          ctx.font = '20px Arial';
+          const words = scene.text.split(' ');
+          const wordsToShow = Math.floor(words.length * progress);
+          const displayText = words.slice(0, wordsToShow).join(' ');
+          wrapText(ctx, displayText, canvas.width / 2, canvas.height - 100, canvas.width - 100, 28);
+
+          if (progress < 1) {
+            animationRef.current = requestAnimationFrame(animate);
+          } else {
+            // Scene complete, move to next
+            if (currentScene < scenes.length - 1) {
+              setCurrentScene(currentScene + 1);
+              setSceneProgress(0);
+            } else {
+              setIsPlaying(false);
+              if (onComplete) onComplete();
+            }
+          }
+        };
+
+        animationRef.current = requestAnimationFrame(animate);
+
+        return () => {
+          if (animationRef.current) {
+            cancelAnimationFrame(animationRef.current);
+          }
+        };
+      }
+    }, [isPlaying, currentScene]);
+
+    // Text-to-Speech narration
+    useEffect(() => {
+      if (isPlaying && 'speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(scenes[currentScene].narration);
+        utterance.rate = 0.9;
+        utterance.pitch = 1.1;
+        utterance.volume = 1;
+        
+        // Try to use a female voice
+        const voices = speechSynthesis.getVoices();
+        const femaleVoice = voices.find(voice => 
+          voice.name.includes('Female') || 
+          voice.name.includes('female') ||
+          voice.name.includes('Samantha') ||
+          voice.name.includes('Victoria')
+        );
+        if (femaleVoice) {
+          utterance.voice = femaleVoice;
+        }
+
+        speechSynthesis.speak(utterance);
+        speechSynthRef.current = utterance;
+
+        return () => {
+          speechSynthesis.cancel();
+        };
+      }
+    }, [isPlaying, currentScene]);
+
+    const drawVolcano = (ctx, canvas, progress, animation) => {
+      const centerX = canvas.width / 2;
+      const baseY = canvas.height - 150;
+
+      // Draw mountain
+      ctx.fillStyle = '#8B4513';
+      ctx.beginPath();
+      ctx.moveTo(centerX - 150, baseY);
+      ctx.lineTo(centerX, baseY - 200);
+      ctx.lineTo(centerX + 150, baseY);
+      ctx.closePath();
+      ctx.fill();
+
+      // Draw crater
+      ctx.fillStyle = '#654321';
+      ctx.beginPath();
+      ctx.ellipse(centerX, baseY - 200, 30, 15, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      if (animation === 'eruption' || animation === 'example') {
+        // Lava eruption
+        const eruptionHeight = progress * 100;
+        ctx.fillStyle = '#FF4500';
+        ctx.beginPath();
+        ctx.arc(centerX, baseY - 200 - eruptionHeight, 20 + progress * 30, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Particles
+        for (let i = 0; i < 10; i++) {
+          const angle = (i / 10) * Math.PI * 2;
+          const distance = progress * 50;
+          const x = centerX + Math.cos(angle) * distance;
+          const y = baseY - 200 - eruptionHeight + Math.sin(angle) * distance;
+          ctx.fillStyle = '#FFA500';
+          ctx.beginPath();
+          ctx.arc(x, y, 5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    };
+
+    const drawPlant = (ctx, canvas, progress, animation) => {
+      const centerX = canvas.width / 2;
+      const baseY = canvas.height - 100;
+
+      // Draw stem
+      ctx.strokeStyle = '#228B22';
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.moveTo(centerX, baseY);
+      ctx.lineTo(centerX, baseY - 150 * progress);
+      ctx.stroke();
+
+      if (progress > 0.3) {
+        // Draw leaves
+        const leafProgress = (progress - 0.3) / 0.7;
+        [-40, 40].forEach((offset, idx) => {
+          ctx.fillStyle = '#32CD32';
+          ctx.beginPath();
+          ctx.ellipse(
+            centerX + offset * leafProgress,
+            baseY - 100 - idx * 30,
+            30 * leafProgress,
+            20 * leafProgress,
+            offset > 0 ? -0.5 : 0.5,
+            0,
+            Math.PI * 2
+          );
+          ctx.fill();
+        });
+      }
+
+      if (animation === 'process' || animation === 'example') {
+        // Sun
+        const sunSize = 40 + Math.sin(progress * Math.PI * 4) * 5;
+        ctx.fillStyle = '#FFD700';
+        ctx.beginPath();
+        ctx.arc(100, 100, sunSize, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Sun rays
+        for (let i = 0; i < 8; i++) {
+          const angle = (i / 8) * Math.PI * 2 + progress * Math.PI;
+          ctx.strokeStyle = '#FFA500';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(100 + Math.cos(angle) * 50, 100 + Math.sin(angle) * 50);
+          ctx.lineTo(100 + Math.cos(angle) * 70, 100 + Math.sin(angle) * 70);
+          ctx.stroke();
+        }
+      }
+    };
+
+    const drawGeneric = (ctx, canvas, progress) => {
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+
+      // Animated circles
+      for (let i = 0; i < 5; i++) {
+        const radius = 50 + i * 30;
+        const alpha = (1 - progress) * 0.3;
+        ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius * progress, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // Brain icon
+      ctx.fillStyle = 'white';
+      ctx.font = '80px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('🧠', centerX, centerY + 30);
+    };
+
+    const wrapText = (ctx, text, x, y, maxWidth, lineHeight) => {
+      ctx.fillStyle = 'white';
+      ctx.textAlign = 'center';
+      const words = text.split(' ');
+      let line = '';
+      let yPos = y;
+
+      words.forEach((word, index) => {
+        const testLine = line + word + ' ';
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && index > 0) {
+          ctx.fillText(line, x, yPos);
+          line = word + ' ';
+          yPos += lineHeight;
+        } else {
+          line = testLine;
+        }
+      });
+      ctx.fillText(line, x, yPos);
+    };
+
+    return (
+      <div className="space-y-4">
+        <div className="relative bg-black rounded-lg overflow-hidden shadow-2xl">
+          <canvas
+            ref={canvasRef}
+            width={800}
+            height={450}
+            className="w-full"
+          />
+          
+          {!isPlaying && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+              <button
+                onClick={() => setIsPlaying(true)}
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-4 rounded-full text-lg font-bold flex items-center gap-3 shadow-2xl transform hover:scale-105 transition-all"
+              >
+                <Play className="w-8 h-8" />
+                Play AI-Generated Video
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div className="bg-gray-800 rounded-lg p-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-white font-semibold">
+              Scene {currentScene + 1} of {scenes.length}: {scenes[currentScene].title}
+            </span>
+            <span className="text-gray-300 text-sm">
+              {Math.floor(sceneProgress * 100)}%
+            </span>
+          </div>
+          <div className="w-full bg-gray-700 rounded-full h-2">
+            <div
+              className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${sceneProgress * 100}%` }}
+            />
+          </div>
+        </div>
+
+        <div className="flex gap-3">
+          <button
+            onClick={() => setIsPlaying(!isPlaying)}
+            className="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all"
+          >
+            {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+            {isPlaying ? 'Pause' : 'Play'}
+          </button>
+          
+          <button
+            onClick={() => {
+              if (currentScene < scenes.length - 1) {
+                setCurrentScene(currentScene + 1);
+                setSceneProgress(0);
+              }
+            }}
+            disabled={currentScene >= scenes.length - 1}
+            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
+            <SkipForward className="w-5 h-5" />
+            Next Scene
+          </button>
+        </div>
+
+        <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4">
+          <div className="flex items-center gap-2 text-green-700 mb-2">
+            <CheckCircle className="w-5 h-5" />
+            <span className="font-semibold">AI-Generated Features:</span>
+          </div>
+          <ul className="text-sm text-gray-700 space-y-1 ml-7">
+            <li>✓ Real-time canvas animation</li>
+            <li>✓ Browser text-to-speech narration (female voice)</li>
+            <li>✓ Synchronized subtitles</li>
+            <li>✓ 4 educational scenes (60 seconds total)</li>
+            <li>✓ Colorful, engaging visuals</li>
+          </ul>
+        </div>
+      </div>
+    );
+  };
+
+  const handleStartLearning = () => {
+    if (topic.trim()) {
+      const lesson = generateLesson(topic);
+      setCurrentLesson(lesson);
+      setIsLearning(true);
+      setCurrentPage('video');
+      setSelectedAnswers({});
+      setShowResults(false);
+      setQuizScore(null);
+    }
+  };
+
+  const handleQuizSubmit = () => {
+    let correct = 0;
+    currentLesson.quiz.forEach((q, idx) => {
+      if (selectedAnswers[idx] === q.correct) {
+        correct++;
+      }
+    });
+    setQuizScore(correct);
+    setShowResults(true);
+    setUserProgress(prev => ({
+      ...prev,
+      quizzesCompleted: prev.quizzesCompleted + 1,
+      totalScore: prev.totalScore + correct
+    }));
+  };
+
+  const MatchingGame = ({ items }) => {
+    const [matches, setMatches] = useState({});
+    const [selected, setSelected] = useState(null);
+    const [score, setScore] = useState(0);
+
+    const handleTermClick = (term) => {
+      setSelected({ type: 'term', value: term });
+    };
+
+    const handleMatchClick = (match) => {
+      if (selected && selected.type === 'term') {
+        const correctMatch = items.find(item => item.term === selected.value);
+        if (correctMatch.match === match) {
+          setMatches({ ...matches, [selected.value]: match });
+          setScore(score + 1);
+        }
+        setSelected(null);
+      }
+    };
+
+    return (
+      <div className="bg-white rounded-lg p-6 shadow-lg">
+        <h3 className="text-xl font-bold text-purple-600 mb-4 flex items-center gap-2">
+          <Trophy className="w-6 h-6" />
+          {currentLesson.game.title}
+        </h3>
+        <p className="text-gray-600 mb-4">Match the terms with their meanings! Score: {score}/{items.length}</p>
+        
+        <div className="grid md:grid-cols-2 gap-6">
+          <div>
+            <h4 className="font-semibold mb-3 text-blue-600">Terms</h4>
+            {items.map((item, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleTermClick(item.term)}
+                disabled={matches[item.term]}
+                className={`w-full p-3 mb-2 rounded-lg text-left transition-all ${
+                  matches[item.term] 
+                    ? 'bg-green-100 text-green-800 border-2 border-green-400' 
+                    : selected?.value === item.term
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-blue-50 hover:bg-blue-100 text-blue-800'
+                }`}
+              >
+                {item.term} {matches[item.term] && '✓'}
+              </button>
+            ))}
+          </div>
+          
+          <div>
+            <h4 className="font-semibold mb-3 text-purple-600">Meanings</h4>
+            {items.map((item, idx) => {
+              const isMatched = Object.values(matches).includes(item.match);
+              return (
+                <button
+                  key={idx}
+                  onClick={() => handleMatchClick(item.match)}
+                  disabled={isMatched}
+                  className={`w-full p-3 mb-2 rounded-lg text-left transition-all ${
+                    isMatched
+                      ? 'bg-green-100 text-green-800 border-2 border-green-400'
+                      : 'bg-purple-50 hover:bg-purple-100 text-purple-800'
+                  }`}
+                >
+                  {item.match} {isMatched && '✓'}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {score === items.length && (
+          <div className="mt-6 p-4 bg-yellow-100 border-2 border-yellow-400 rounded-lg text-center">
+            <Award className="w-12 h-12 mx-auto text-yellow-600 mb-2" />
+            <p className="text-xl font-bold text-yellow-800">Perfect Match! 🎉</p>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const LoginPage = () => (
+    <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
+        <div className="text-center mb-8">
+          <Brain className="w-16 h-16 mx-auto text-purple-600 mb-4" />
+          <h1 className="text-3xl font-bold text-gray-800">LearnAI Platform</h1>
+          <p className="text-gray-600 mt-2">Your AI-Powered Learning Journey</p>
+        </div>
+        
+        <input
+          type="text"
+          placeholder="Username"
+          className="w-full p-3 border-2 border-gray-300 rounded-lg mb-4 focus:border-purple-500 focus:outline-none cursor-text"
+          value={loginForm.username}
+          onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })}
+          autoComplete="username"
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          className="w-full p-3 border-2 border-gray-300 rounded-lg mb-6 focus:border-purple-500 focus:outline-none cursor-text"
+          value={loginForm.password}
+          onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+          autoComplete="current-password"
+        />
+        
+        <button
+          onClick={() => {
+            if (loginForm.username) {
+              setIsAuthenticated(true);
+              setUsername(loginForm.username);
+            }
+          }}
+          className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all"
+        >
+          Login
+        </button>
+        
+        <p className="text-center text-gray-600 mt-4 text-sm">
+          Demo: Use any username to login
+        </p>
+      </div>
+    </div>
+  );
+
+  if (!isAuthenticated) {
+    return <LoginPage />;
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+      {/* Navigation */}
+      <nav className="bg-white shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              {(isLearning || currentPage === 'progress') && (
+                <button
+                  onClick={handleGoBack}
+                  className="flex items-center gap-2 text-gray-700 hover:text-purple-600 transition-colors bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                  <span className="font-semibold">Back</span>
+                </button>
+              )}
+              <Brain className="w-8 h-8 text-purple-600" />
+              <h1 className="text-2xl font-bold text-gray-800">LearnAI</h1>
+            </div>
+            
+            <div className="hidden md:flex gap-6">
+              <button onClick={() => setCurrentPage('home')} className="flex items-center gap-2 text-gray-700 hover:text-purple-600 transition-colors">
+                <BookOpen className="w-5 h-5" />
+                Home
+              </button>
+              <button onClick={() => setCurrentPage('progress')} className="flex items-center gap-2 text-gray-700 hover:text-purple-600 transition-colors">
+                <BarChart3 className="w-5 h-5" />
+                Progress
+              </button>
+              <button className="flex items-center gap-2 text-gray-700 hover:text-purple-600 transition-colors">
+                <Users className="w-5 h-5" />
+                Community
+              </button>
+              <button className="flex items-center gap-2 text-gray-700 hover:text-purple-600 transition-colors">
+                <Settings className="w-5 h-5" />
+                Settings
+              </button>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-600">Welcome, {username}!</span>
+              <button
+                onClick={() => {
+                  const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = 'learning-platform.html';
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                className="hidden md:flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors text-sm font-semibold"
+                title="Download this app"
+              >
+                <Download className="w-4 h-4" />
+                Download
+              </button>
+              <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden">
+                {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {currentPage === 'home' && !isLearning && (
+          <div className="text-center">
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">
+              Learn Anything with AI! 🚀
+            </h2>
+            <p className="text-xl text-gray-600 mb-8">
+              Enter any topic and start your interactive learning journey
+            </p>
+
+            <div className="max-w-2xl mx-auto mb-12">
+              <div className="bg-white rounded-2xl shadow-xl p-8">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Enter a topic (e.g., How Volcanoes Erupt, Photosynthesis, Solar System...)"
+                    className="w-full p-4 pr-16 text-lg border-2 border-gray-300 rounded-lg mb-4 focus:border-purple-500 focus:outline-none"
+                    value={topic}
+                    onChange={(e) => setTopic(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleStartLearning()}
+                  />
+                  <button
+                    onClick={toggleMicrophone}
+                    className={`absolute right-3 top-3 p-2 rounded-lg transition-all ${
+                      isListening 
+                        ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse' 
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                    }`}
+                    title={isListening ? 'Stop listening' : 'Voice search'}
+                  >
+                    {isListening ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
+                  </button>
+                </div>
+                {isListening && (
+                  <p className="text-sm text-red-600 mb-3 animate-pulse">🎤 Listening... Speak now!</p>
+                )}
+                <button
+                  onClick={handleStartLearning}
+                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-lg text-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all flex items-center justify-center gap-2"
+                >
+                  <Play className="w-6 h-6" />
+                  Start Learning
+                </button>
+              </div>
+            </div>
+
+            {/* Features Grid */}
+            <div className="grid md:grid-cols-3 gap-6 mb-8">
+              <div className="bg-white rounded-xl p-6 shadow-lg">
+                <Video className="w-12 h-12 text-blue-600 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Video Lessons</h3>
+                <p className="text-gray-600">Watch curated educational videos</p>
+              </div>
+              <div className="bg-white rounded-xl p-6 shadow-lg">
+                <Brain className="w-12 h-12 text-purple-600 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Interactive Quizzes</h3>
+                <p className="text-gray-600">Test your knowledge instantly</p>
+              </div>
+              <div className="bg-white rounded-xl p-6 shadow-lg">
+                <Trophy className="w-12 h-12 text-yellow-600 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Fun Games</h3>
+                <p className="text-gray-600">Learn through play and practice</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentPage === 'progress' && (
+          <div className="bg-white rounded-2xl shadow-xl p-8">
+            <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+              <BarChart3 className="w-8 h-8 text-purple-600" />
+              Your Learning Progress
+            </h2>
+            
+            <div className="grid md:grid-cols-3 gap-6 mb-8">
+              <div className="bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl p-6">
+                <Video className="w-10 h-10 text-blue-600 mb-3" />
+                <p className="text-3xl font-bold text-blue-800">{userProgress.videosWatched}</p>
+                <p className="text-blue-700">Videos Watched</p>
+              </div>
+              <div className="bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl p-6">
+                <Brain className="w-10 h-10 text-purple-600 mb-3" />
+                <p className="text-3xl font-bold text-purple-800">{userProgress.quizzesCompleted}</p>
+                <p className="text-purple-700">Quizzes Completed</p>
+              </div>
+              <div className="bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-xl p-6">
+                <Trophy className="w-10 h-10 text-yellow-600 mb-3" />
+                <p className="text-3xl font-bold text-yellow-800">{userProgress.totalScore}</p>
+                <p className="text-yellow-700">Total Points</p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setCurrentPage('home')}
+              className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors"
+            >
+              Back to Home
+            </button>
+          </div>
+        )}
+
+        {isLearning && currentLesson && (
+          <div className="space-y-8">
+            {/* Video Section */}
+            {currentPage === 'video' && (
+              <div className="bg-white rounded-2xl shadow-xl p-8">
+                <h2 className="text-3xl font-bold text-gray-800 mb-6">{currentLesson.title}</h2>
+                
+                {/* AI Animated Video */}
+                <div className="mb-8">
+                  <div className="bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg p-4 mb-4">
+                    <div className="flex items-center gap-3">
+                      <Brain className="w-6 h-6 text-purple-600" />
+                      <div>
+                        <p className="font-bold text-purple-900">AI-Generated Animated Video</p>
+                        <p className="text-sm text-purple-700">Watch the custom animation with voiceover narration!</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <AnimatedVideoPlayer 
+                    scenes={currentLesson.animatedScenes}
+                    onComplete={() => {
+                      setUserProgress(prev => ({ ...prev, videosWatched: prev.videosWatched + 1 }));
+                    }}
+                  />
+                </div>
+
+                {/* YouTube Alternative */}
+                <div className="bg-gray-50 rounded-lg p-6 mb-6">
+                  <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <Video className="w-5 h-5 text-red-600" />
+                    Watch More on YouTube
+                  </h3>
+                  <p className="text-gray-600 mb-4">Want to learn more? Check out this additional video:</p>
+                  <a
+                    href={`https://www.youtube.com/watch?v=${currentLesson.videoId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-all"
+                  >
+                    <Play className="w-5 h-5" />
+                    Watch on YouTube
+                  </a>
+                </div>
+
+                <div className="bg-blue-50 rounded-lg p-6 mb-6">
+                  <h3 className="text-xl font-bold text-blue-800 mb-3">📝 Summary</h3>
+                  <p className="text-gray-700 leading-relaxed">{currentLesson.summary}</p>
+                </div>
+
+                <button
+                  onClick={() => {
+                    setCurrentPage('quiz');
+                    setUserProgress(prev => ({ ...prev, videosWatched: prev.videosWatched + 1 }));
+                  }}
+                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-lg text-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all"
+                >
+                  Continue to Quiz →
+                </button>
+              </div>
+            )}
+
+            {/* Quiz Section */}
+            {currentPage === 'quiz' && (
+              <div className="bg-white rounded-2xl shadow-xl p-8">
+                <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                  <Brain className="w-8 h-8 text-purple-600" />
+                  Test Your Knowledge
+                </h2>
+
+                {currentLesson.quiz.map((q, idx) => (
+                  <div key={idx} className="mb-6 p-6 bg-gray-50 rounded-lg">
+                    <p className="font-semibold text-lg text-gray-800 mb-4">
+                      {idx + 1}. {q.question}
+                    </p>
+                    
+                    <div className="space-y-2">
+                      {q.options.map((option, optIdx) => (
+                        <button
+                          key={optIdx}
+                          onClick={() => !showResults && setSelectedAnswers({ ...selectedAnswers, [idx]: optIdx })}
+                          disabled={showResults}
+                          className={`w-full p-3 rounded-lg text-left transition-all ${
+                            showResults
+                              ? optIdx === q.correct
+                                ? 'bg-green-100 border-2 border-green-500 text-green-800'
+                                : selectedAnswers[idx] === optIdx
+                                ? 'bg-red-100 border-2 border-red-500 text-red-800'
+                                : 'bg-white border-2 border-gray-300'
+                              : selectedAnswers[idx] === optIdx
+                              ? 'bg-purple-100 border-2 border-purple-500 text-purple-800'
+                              : 'bg-white border-2 border-gray-300 hover:border-purple-300'
+                          }`}
+                        >
+                          {option}
+                          {showResults && optIdx === q.correct && <CheckCircle className="inline ml-2 w-5 h-5" />}
+                          {showResults && selectedAnswers[idx] === optIdx && optIdx !== q.correct && <XCircle className="inline ml-2 w-5 h-5" />}
+                        </button>
+                      ))}
+                    </div>
+
+                    {showResults && (
+                      <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                        <p className="text-blue-800">{q.explanation}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                {!showResults ? (
+                  <button
+                    onClick={handleQuizSubmit}
+                    disabled={Object.keys(selectedAnswers).length < currentLesson.quiz.length}
+                    className="w-full bg-purple-600 text-white py-4 rounded-lg text-lg font-semibold hover:bg-purple-700 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    Submit Quiz
+                  </button>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="p-6 bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-gray-800">
+                        Your Score: {quizScore}/{currentLesson.quiz.length}
+                      </p>
+                      <p className="text-gray-600 mt-2">
+                        {quizScore === currentLesson.quiz.length ? '🎉 Perfect Score!' :
+                         quizScore >= currentLesson.quiz.length * 0.7 ? '👏 Great Job!' :
+                         '💪 Keep Learning!'}
+                      </p>
+                    </div>
+                    
+                    <button
+                      onClick={() => setCurrentPage('game')}
+                      className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white py-4 rounded-lg text-lg font-semibold hover:from-yellow-600 hover:to-orange-600 transition-all"
+                    >
+                      Play Learning Game →
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Game Section */}
+            {currentPage === 'game' && (
+              <div>
+                <MatchingGame items={currentLesson.game.items} />
+                
+                <div className="mt-6 flex gap-4">
+                  <button
+                    onClick={() => {
+                      setIsLearning(false);
+                      setCurrentPage('home');
+                      setTopic('');
+                    }}
+                    className="flex-1 bg-purple-600 text-white py-4 rounded-lg text-lg font-semibold hover:bg-purple-700 transition-all"
+                  >
+                    Learn Another Topic
+                  </button>
+                  <button
+                    onClick={() => setCurrentPage('progress')}
+                    className="flex-1 bg-blue-600 text-white py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-all"
+                  >
+                    View Progress
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default LearningPlatform;
